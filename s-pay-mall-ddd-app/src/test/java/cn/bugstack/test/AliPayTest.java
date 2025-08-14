@@ -28,7 +28,7 @@ public class AliPayTest {
     // 「沙箱环境」服务器异步通知回调地址
     public static String notify_url = "https://xfg.natapp.cn/api/v1/alipay/alipay_notify_url";
     // 「沙箱环境」页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-    public static String return_url = "https://gaga.plus";
+    public static String return_url = "https://nuaa.edu.cn";
     // 「沙箱环境」
     public static String gatewayUrl = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
     // 签名方式

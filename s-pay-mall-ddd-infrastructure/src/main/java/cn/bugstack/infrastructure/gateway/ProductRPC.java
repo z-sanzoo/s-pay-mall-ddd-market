@@ -13,7 +13,7 @@ public class ProductRPC {
         productVO.setProductId(productId);
         productVO.setProductName("MyBatisBook");
         productVO.setProductDesc("MyBatisBook");
-        productVO.setPrice(new BigDecimal("100.00"));
+        productVO.setPrice(new BigDecimal("90.00"));
         return productVO;
     }
 

@@ -53,7 +53,7 @@ function showPaymentConfirm(price) {
     modal.innerHTML = `
         <h3>支付确认</h3>
         <p>商品金额：￥${price}</p>
-        <p>买家账号：<span class="copyable" data-copy="kvhmoj3832@sandbox.com">kvhmoj3832@sandbox.com</span></p>
+        <p>买家账号：<span class="copyable" data-copy="stmctj6046@sandbox.com">stmctj6046@sandbox.com</span></p>
         <p>登录密码：111111</p>
         <p>支付密码：111111</p>
         <div class="modal-buttons">
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (json.code === "0000") { // 假设成功的code是"0000"
                         document.querySelectorAll('form').forEach(form => form.remove());
                         document.body.insertAdjacentHTML('beforeend', json.data);
-                        showPaymentConfirm(goods.payPrice);
+                        showPaymentConfirm(goods.originalPrice);
                     } else {
                         console.error('Error:', json.info); // 输出错误信息
                     }

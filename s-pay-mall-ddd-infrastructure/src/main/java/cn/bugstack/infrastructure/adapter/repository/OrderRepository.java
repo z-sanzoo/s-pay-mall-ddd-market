@@ -45,7 +45,7 @@ public class OrderRepository implements IOrderRepository {
         order.setOrderTime(orderEntity.getOrderTime());
         order.setTotalAmount(productEntity.getPrice());
         order.setStatus(orderEntity.getOrderStatusVO().getCode());
-        order.setMarketType(MarketTypeVO.NO_MARKET.getCode());
+        order.setMarketType(orderEntity.getMarketType());
         order.setMarketDeductionAmount(BigDecimal.ZERO);
         order.setPayAmount(productEntity.getPrice());
         order.setMarketType(orderEntity.getMarketType());
