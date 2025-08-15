@@ -6,11 +6,11 @@ import cn.bugstack.infrastructure.gateway.dto.WeixinQrCodeRequestDTO;
 import cn.bugstack.infrastructure.gateway.dto.WeixinQrCodeResponseDTO;
 import cn.bugstack.infrastructure.gateway.dto.WeixinTemplateMessageDTO;
 import cn.bugstack.infrastructure.gateway.dto.WeixinTokenResponseDTO;
+import cn.hutool.core.util.IdUtil;
 import com.google.common.cache.Cache;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
-
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,7 +34,12 @@ public class LoginPort implements ILoginPort {
 
     @Override
     public String createQrCodeTicket() throws IOException {
-        // 1. 获取 accessToken
+        String sceneStr = IdUtil.getSnowflake().nextIdStr();
+        return createQrCodeTicket(sceneStr);
+    }
+
+    @Override
+    public String createQrCodeTicket(String sceneStr) throws IOException {
         String accessToken = weixinAccessToken.getIfPresent(appid);
         if (null == accessToken) {
             Call<WeixinTokenResponseDTO> call = weixinApiService.getToken("client_credential", appid, appSecret);
@@ -47,10 +52,10 @@ public class LoginPort implements ILoginPort {
         // 2. 生成 ticket
         WeixinQrCodeRequestDTO weixinQrCodeReq = WeixinQrCodeRequestDTO.builder()
                 .expire_seconds(2592000)
-                .action_name(WeixinQrCodeRequestDTO.ActionNameTypeVO.QR_SCENE.getCode())
+                .action_name(WeixinQrCodeRequestDTO.ActionNameTypeVO.QR_STR_SCENE.getCode())
                 .action_info(WeixinQrCodeRequestDTO.ActionInfo.builder()
                         .scene(WeixinQrCodeRequestDTO.ActionInfo.Scene.builder()
-                                .scene_id(100601)
+                                .scene_str(sceneStr)
                                 .build())
                         .build())
                 .build();
@@ -83,6 +88,11 @@ public class LoginPort implements ILoginPort {
 
         Call<Void> call = weixinApiService.sendMessage(accessToken, templateMessageDTO);
         call.execute();
+    }
+
+    @Override
+    public void sendLoginTemplate(String openid, String sceneStr) throws IOException {
+
     }
 
 }

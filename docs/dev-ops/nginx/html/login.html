@@ -95,8 +95,8 @@
 </head>
 <body>
 <div class="login-container">
-    <img src="./images/logo.png" alt="S Pay Mall Logo" class="logo">
-    <h1>欢迎登录 - 紫杉鼠拼团</h1>
+    <img src="https://bugstack.cn/images/article/project/group-buy-market/logo.png" alt="S Pay Mall Logo" class="logo">
+    <h1>欢迎登录 - 小傅哥拼团</h1>
     <div class="qr-code">
         <img id="qr-code-img" src="images/placeholder.png" alt="微信二维码" class="pulse">
     </div>
@@ -104,58 +104,77 @@
 </div>
 
 <script>
-    var sPayMallUrl = "http://127.0.0.1:8080";
+    var sPayMallUrl = "http://127.0.0.1:80";
 
     document.addEventListener("DOMContentLoaded", function() {
-        // 获取二维码 ticket
-        fetch(sPayMallUrl + '/api/v1/login/weixin_qrcode_ticket')
-            .then(response => response.json())
-            .then(data => {
-                if (data.code === "0000") {
-                    const ticket = data.data;
-                    const qrCodeImg = document.getElementById('qr-code-img');
-                    qrCodeImg.src = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`;
-                    qrCodeImg.classList.remove('pulse');
 
-                    // 开始轮询检查登录状态
-                    const intervalId = setInterval(() => {
-                        checkLoginStatus(ticket, intervalId);
-                    }, 3000); // 每3秒检查一次
-                } else {
-                    console.error('获取二维码 ticket 失败:', data.info);
+        // https://github.com/fingerprintjs/fingerprintjs
+        const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4')
+            .then(FingerprintJS => FingerprintJS.load())
+
+        // Get the visitor identifier when you need it.
+        fpPromise
+            .then(fp => fp.get())
+            .then(result => {
+                // This is the visitor identifier:
+                const visitorId = result.visitorId
+
+                // 获取场景值
+                let sceneStr = visitorId.toUpperCase();
+
+                // 获取二维码 ticket
+                fetch(sPayMallUrl + '/api/v1/login/weixin_qrcode_ticket_scene?sceneStr='+sceneStr)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === "0000") {
+                            const ticket = data.data;
+                            const qrCodeImg = document.getElementById('qr-code-img');
+                            qrCodeImg.src = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`;
+                            qrCodeImg.classList.remove('pulse');
+
+                            // 开始轮询检查登录状态
+                            const intervalId = setInterval(() => {
+                                checkLoginStatus(ticket, intervalId);
+                            }, 3000); // 每3秒检查一次
+                        } else {
+                            console.error('获取二维码 ticket 失败:', data.info);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('请求失败:', error);
+                    });
+
+                function checkLoginStatus(ticket, intervalId) {
+                    fetch(sPayMallUrl + `/api/v1/login/check_login_scene?ticket=${ticket}&sceneStr=`+sceneStr)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.code === "0000") {
+                                console.info("login success");
+                                // 停止轮询
+                                clearInterval(intervalId);
+                                // 保存登录 token 到 cookie，设置有效期为30天
+                                setCookie('loginToken', data.data, 30);
+                                // 在这里可以重定向到登录后的页面
+                                window.location.href = 'index.html'; // 假设登录成功后跳转到首页
+                            } else {
+                                console.info("login wait");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('请求失败:', error);
+                        });
                 }
-            })
-            .catch(error => {
-                console.error('请求失败:', error);
+
+                function setCookie(name, value, days) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    const expires = "expires=" + date.toUTCString();
+                    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+                }
+
             });
 
-        function checkLoginStatus(ticket, intervalId) {
-            fetch(sPayMallUrl + `/api/v1/login/check_login?ticket=${ticket}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.code === "0000") {
-                        console.info("login success");
-                        // 停止轮询
-                        clearInterval(intervalId);
-                        // 保存登录 token 到 cookie，设置有效期为30天
-                        setCookie('loginToken', data.data, 30);
-                        // 在这里可以重定向到登录后的页面
-                        window.location.href = 'index.html'; // 假设登录成功后跳转到首页
-                    } else {
-                        console.info("login wait");
-                    }
-                })
-                .catch(error => {
-                    console.error('请求失败:', error);
-                });
-        }
 
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = "expires=" + date.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
-        }
     });
 </script>
 </body>

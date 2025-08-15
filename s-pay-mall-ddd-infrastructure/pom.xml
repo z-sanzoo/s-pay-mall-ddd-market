@@ -35,6 +35,10 @@
             <groupId>cn.bugstack</groupId>
             <artifactId>s-pay-mall-ddd-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
     </dependencies>
     
     <build>
