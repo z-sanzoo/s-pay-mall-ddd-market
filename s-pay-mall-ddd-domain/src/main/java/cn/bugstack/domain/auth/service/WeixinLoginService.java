@@ -26,7 +26,7 @@ public class WeixinLoginService implements ILoginService {
     @Override
     public String createQrCodeTicket(String sceneStr) throws Exception {
         String ticket = loginPort.createQrCodeTicket(sceneStr);
-        openidToken.put(sceneStr, ticket);
+        openidToken.put(ticket,sceneStr);
         return ticket;
     }
 
@@ -37,9 +37,9 @@ public class WeixinLoginService implements ILoginService {
 
     @Override
     public String checkLogin(String ticket, String sceneStr) {
-        String cacheTicket = openidToken.getIfPresent(sceneStr);
-        if (StringUtils.isBlank(cacheTicket) || !cacheTicket.equals(ticket)) return null;
-        return checkLogin(ticket);
+        String cacheSceneStr = openidToken.getIfPresent(ticket);
+        if (StringUtils.isBlank(cacheSceneStr) || !cacheSceneStr.equals(sceneStr)) return null;
+        return ticket;
     }
 
     @Override
